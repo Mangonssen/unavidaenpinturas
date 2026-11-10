@@ -374,6 +374,7 @@ p {
 
     img {
         width: 3rem;
+        height: unset;
     }
 }
 
