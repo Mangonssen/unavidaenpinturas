@@ -655,5 +655,43 @@ p {
     }
 }
 
+#back {
+    background: url(./assets/img/back.png);
+    background-size: contain;
+    color: var(--offwhite);
+
+    div {
+
+        display: flex;
+        flex-direction: column;
+        margin: -1rem 2rem 7rem 2rem;
+        padding: 4rem 3rem;
+        background: var(--black);
+        gap: 2rem;
+
+        div {
+            display: flex;
+            flex-direction: row;
+            gap: unset;
+            width: 100%;
+            justify-content: space-between;
+
+            padding: 0;
+            margin: 0;
+            
+            p {
+                width: 40%;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        #authornotes {
+            color: #999;
+            font-size: .75rem;
+        }
+    }
+}
+
 
 

@@ -402,6 +402,25 @@
                 <p>un pasillo oscuro que llevaba a Hemodinamia. Su vestido fue lo último que vi, el momento exacto en
                     que el rojo se disolvía en el <span id="negro">negro.</span></p>
             </section>
+            <section class="page left bg-beige noise"></section>
+            <section class="page right bg-beige noise"></section>
+            <section class="page left bg-black noise"></section>
+            <section class="page right bg-black noise"></section>
+            <section id="back" class="page single">
+                <div>
+                    <p>Una mujer recorre la vida de un artista a través de sus cuadros, sus obsesiones y sus silencios.
+                        Entre la pintura y la biografía, este libro es una forma de mirar, de recordar y de preguntarse
+                        qué vemos cuando miramos.</p>
+                    <div>
+                        <p class="red">“El arte también es una manera de vivir.”</p>
+                        <p class="red">“Hay vidas que se cuentan en imágenes.”</p>
+                    </div>
+                    <p id="authornotes">María Gainza (Buenos Aires, 1973) es escritora y crítica de arte. Ha publicado
+                        La luz negra (2007), El nervio óptico (2012), Las poetas (2018) y Óptica (2021), entre otros
+                        libros.</p>
+                </div>
+            </section>
+
         </div>
     </div>
 
@@ -474,7 +493,7 @@
             bookArea = document.getElementById("book");
 
             book.addEventListener("mouseenter", () => {
-                if (current == 5) { 
+                if (current == 5) {
                     pulseAudio.currentTime = 0;
                     pulseAudio.play();
                     console.log("reached");
