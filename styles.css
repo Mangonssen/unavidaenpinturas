@@ -72,9 +72,8 @@ body {
 .book {
     display: flex;
     justify-content: center;
-    align-items: stretch;
     width: 100%;
-    gap: 0;
+    gap: 0px;
     transition: all .3s ease;
 }
 
@@ -83,7 +82,6 @@ body {
 .page {
     width: 50%;
     aspect-ratio: 210 / 297;
-    background: white;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -93,6 +91,26 @@ body {
     transition: transform 0.4s ease;
     padding-top: var(--pd-top);
     padding-bottom: var(--pd-bottom);
+    border: none;
+    margin: 0;
+}
+
+.page::after {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 8rem;
+    top: 0;
+}
+
+.page.left::after {
+    background: linear-gradient(to left, #00000044, #00000000);
+    right: 0;
+}
+
+.page.right::after {
+    background: linear-gradient(to right, #00000044, #00000000);
+    left: 0;
 }
 
 .page.single {
@@ -103,13 +121,13 @@ body {
 .page.left {
     padding-right: var(--pd-inner);
     padding-left: var(--pd-outer);
-    box-shadow: inset 0 5px 25px rgba(0, 0, 0, 0.05);
+    /* box-shadow: inset 0 5px 50px rgba(0, 0, 0, 1); */
 }
 
 .page.right {
     padding-right: var(--pd-outer);
     padding-left: var(--pd-inner);
-    box-shadow: inset 0 5px 25px rgba(0, 0, 0, 0.05);
+    /* box-shadow: inset 0 5px 50px rgba(0, 0, 0, 1); */
 }
 
 .bg-red {
@@ -217,13 +235,13 @@ body {
 .controls button {
     background: var(--red);
     color: var(--black);
-    font-family: "Arial", sans-serif;
+    font-family: "Underdog";
     font-weight: 400;
     font-size: 1.25rem;
     border: none;
     padding: 1rem 3rem;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 0px;
     transition: 0.2s;
 }
 
@@ -234,13 +252,6 @@ body {
 .controls button:disabled {
     opacity: 0.3;
     cursor: not-allowed;
-}
-
-#counter {
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 1rem;
-    text-transform: uppercase;
 }
 
 span,
@@ -258,7 +269,8 @@ p {
     justify-content: space-between;
     width: 100%;
 
-    .col1, .col2 {
+    .col1,
+    .col2 {
         display: flex;
         flex-direction: column;
         max-width: 21ch;
@@ -269,7 +281,7 @@ p {
 
 .book.turning {
     opacity: 0;
-    transform: rotateZ(5deg) rotateX(10deg) rotateY(10deg) ;
+    transform: rotateZ(5deg) rotateX(10deg) rotateY(10deg);
 }
 
 /* RESPONSIVE */
@@ -334,364 +346,270 @@ p {
     }
 }
 
+#cover {
+    background: url(./pages/p_1.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+
+}
+
+#innertitle {
+    background: url(./pages/p_5.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+
+}
+
 #imprint {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: end;
-
-    p,
-    span {
-        margin-bottom: 2rem;
-        line-height: 175%;
-        opacity: .5;
-    }
-
-    img {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-    }
-}
-
-#monocol-2 {
-    background: var(--red) url(./assets/img/title-inner.png);
+    background: url(./pages/p_6.png);
     background-size: contain;
-    background-blend-mode: multiply;
-
-    p {
-        position: absolute;
-        font-family: "Protest Revolution";
-        color: var(--red);
-        left: 37.5%;
-        top: 36%;
-        font-size: 1.5rem;
-    }
-
-    span {
-        position: absolute;
-        color: var(--offwhite);
-        right: 30%;
-        bottom: 40%;
-    }
-
-    img {
-        position: absolute;
-        bottom: 2.5%;
-        left: 40%;
-        aspect-ratio: 1/1;
-        width: 7.5rem;
-    }
 }
 
-#title-inner {
-
-    align-items: center;
-
-    h1 {
-        color: var(--red);
-        font-size: 1.5rem;
-        margin-top: 7rem;
-    }
+#innertitle-2 {
+    background: url(./pages/p_7.png);
+    background-size: contain;
 }
 
-#page-2 {
+#p4 {
+    background: url(./pages/p_8.png);
+    background-size: contain;
+}
 
-    background: url(./assets/img/bg-1.png);
-    background-blend-mode: multiply;
+#p5 {
+    background: url(./pages/p_9.png);
+    background-size: contain;
+}
+
+#p6 {
+    background: url(./pages/p_10.png);
     background-size: contain;
 
-    div#page-2-main {
-        position: absolute;
-        bottom: 27.5%;
-
-        max-width: 22ch;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        color: var(--offwhite);
-    }
-
-    div#largeletterdiv {
-
-        display: flex;
-        flex-direction: row;
-        gap: .75rem;
-
-        .huge {
-            color: var(--black);
-            font-size: 5rem;
-            font-family: var(--heading);
-            transform: translateY(10%);
-            text-box-trim: trim-both;
-            text-box-edge: cap alphabetic;
-        }
-    }
 }
 
-@keyframes spiral-eye {
-    0% {
-        transform: skewX(0deg);
-        rotate: 0deg;
-    }
-    20% {
-        transform: skewX(-4deg);
-        rotate: -5deg;
-    }
-    80% {
-        transform: skewX(4deg);
-        rotate: 5deg;
-    }
+#p7 {
+    background: url(./pages/p_11.png);
+    background-size: contain;
+}
+
+#p8 {
+    background: url(./pages/p_12.png);
+    background-size: contain;
+}
+
+#p9 {
+    background: url(./pages/p_13.png);
+    background-size: contain;
+}
+
+#p10 {
+    background: url(./pages/p_14.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+
+}
+
+#p11 {
+    background: url(./pages/p_15.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p12 {
+    background: url(./pages/p_16.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p13 {
+    background: url(./pages/p_17.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p14 {
+    background: url(./pages/p_18.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p15 {
+    background: url(./pages/p_19.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p16 {
+    background: url(./pages/p_20.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p17 {
+    background: url(./pages/p_21.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p18 {
+    background: url(./pages/p_22.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+@keyframes fadetoblack {
     100% {
-        transform: skewX(0deg);
-        rotate: 0deg;
-    }
-}
-
-#page-3 {
-    flex-direction: column;
-
-    img {
-        width: 27rem;
-
-        &:hover {
-            animation: spiral-eye 1s infinite ease-in-out;
-        }
-    }
-}
-
-#page-4 {
-    img {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-    }
-
-    .col2 p {
-        text-align: justify;
-        text-align-last: right;
-    }
-}
-
-#page-5 {
-    align-items: center;
-    img {
-        height: 100%;
-    }
-}
-
-#page-6 {
-
-}
-
-#page-7 {
-    
-    img {
-        position: absolute;
-        width: 24rem;
-        right: -12rem;
-        top: 14%;
-    }
-}
-
-#page-8 {
-    img {
-        position: absolute;
-        width: 24rem;
-        left: -12rem;
-        top: 14%;
-    }
-
-    .col1 p, .col2 p {
-        text-align: justify;
-        text-align-last: right;
-    }
-}
-
-#page-9 {
-    img {
-        width: 12rem;
-        position: absolute;
-        bottom: 10%;
-        left: 30%;
-    }
-
-    .col-2 p {
-        text-align: right;
-    }
-}
-
-#page-10 {
-
-    justify-content: end;
-    color: var(--offwhite);
-    
-    img {
-        width: 99%;
-        position: absolute;
+        background: black;
+        opacity: 1;
         top: 0;
-        left: 0;
-    }
-
-    #eye-cover {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: var(--red)
-        url(./assets/img/noise.png);
-        background-blend-mode: multiply;
-        filter: blur(2px);
-        width: 100%;
-        border-radius: 50%;
-        height: 10rem;
-
-        transition: transform .5s ease-in-out;
-    }
-
-    &:hover {
-        #eye-cover {
-            transform: translateY(6rem);
-        }
     }
 }
 
-#page-11 {
-
-    .col1 div {
-        display: flex;
-        gap: 1rem;
-        text-align-last: justify;
-
-        img {
-            height: 2.5rem;
-        }
-    }
-
-    .col2 {
-
-        img {
-            position: absolute;
-            right: -12rem;
-            width: 24rem;
-            top: 19%;
-        }
-    }
-}
-#page-12 {
-    p {
-        text-align-last: right;
-    }
-    .col1 {
-        img {
-            position: absolute;
-            left: -12rem;
-            width: 24rem;
-            top: 19%;
-        }
-    }
-
-    .col2 {
-        img {
-            height: 2.5rem;
-        }
-        div {
-            display: flex;
-            gap: 1rem;
-        }
-
-        p
-     {
-        text-align-last: justify;
-     }
-    }
-}
-
-#page-13 {
-
-    #pattern {
-        position: absolute;
-        width: 9rem;
-        right: -4.5rem;
-        top: 1rem;
-    }
-
-    #blob-1 {
-        position: absolute;
-        width: 4rem;
-        bottom: -2rem;
-        left: -2rem;
-    }
-}
-
-#page-14 {
-    
-    p {
-        text-align-last: right;
-    }
-
-    #pattern-2 {
-        position: absolute;
-        width: 9rem;
-        left: -4.5rem;
-        top: 1rem;
-    }
-
-    #blob-2 {
-        position: absolute;
-        width: 4rem;
-        top: -2rem;
-        right: -2rem;
-    }
-}
-
-#page-16 {
-    background: url(./assets/img/lastblackeye.png);
+#p19 {
+    background: url(./pages/p_23.png);
     background-size: contain;
-    color: var(--offwhite);
-    #negro {
-        color: var(--red);
+    background-repeat: no-repeat;
+
+    &::after {
+        content: "";
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: var(--black);
+        opacity: 0;
+        
+        top: -100%;
+
+        animation: fadetoblack 3s ease ;
+        animation-fill-mode: forwards;
+        animation-delay: 4s;
+    
+        transition: all .3s ease;
     }
+}
+
+#p20 {
+    background: url(./pages/p_24.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p21 {
+    background: url(./pages/p_25.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p22 {
+    background: url(./pages/p_26.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p23 {
+    background: url(./pages/p_27.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p24 {
+    background: url(./pages/p_28.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#p25 {
+    background: url(./pages/p_29.png);
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #back {
-    background: url(./assets/img/back.png);
+    background: url(./pages/p_30.png);
     background-size: contain;
-    color: var(--offwhite);
-
-    div {
-
-        display: flex;
-        flex-direction: column;
-        margin: -1rem 2rem 7rem 2rem;
-        padding: 4rem 3rem;
-        background: var(--black);
-        gap: 2rem;
-
-        div {
-            display: flex;
-            flex-direction: row;
-            gap: unset;
-            width: 100%;
-            justify-content: space-between;
-
-            padding: 0;
-            margin: 0;
-            
-            p {
-                width: 40%;
-                padding: 0;
-                margin: 0;
-            }
-        }
-
-        #authornotes {
-            color: #999;
-            font-size: .75rem;
-        }
-    }
+    background-repeat: no-repeat;
 }
 
+/* DRAGGABLE IMAGES */
 
+.draggable {
+    position: absolute;
 
+    width: 120px;
+    height: auto;
+
+    cursor: grab;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    touch-action: none;
+
+    transform-origin: center center;
+
+    transition: transform 0.25s ease;
+
+    z-index: 10;
+}
+
+/* While dragging */
+
+.draggable.dragging {
+    cursor: grabbing;
+
+    z-index: 1000;
+
+    transition: none;
+
+    animation: pickup 0.2s ease forwards;
+}
+
+/* Pickup animation */
+
+@keyframes pickup {
+
+    from {
+        scale: 1;
+    }
+
+    to {
+        scale: 1.08;
+    }
+
+}
+
+/* Initial image positions */
+
+/* Page 24 */
+
+#img1 {
+    top: 15%;
+    left: 10%;
+    transform: rotate(-8deg);
+}
+
+#img2 {
+    top: 40%;
+    left: 55%;
+    transform: rotate(5deg);
+}
+
+#img3 {
+    top: 65%;
+    left: 20%;
+    transform: rotate(-4deg);
+}
+
+/* Page 25 */
+
+#img4 {
+    top: 20%;
+    left: 55%;
+    transform: rotate(7deg);
+}
+
+#img5 {
+    top: 55%;
+    left: 15%;
+    transform: rotate(-6deg);
+}
