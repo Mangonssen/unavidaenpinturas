@@ -459,31 +459,39 @@ p {
 
 @keyframes fadetoblack {
     100% {
-        background: black;
         opacity: 1;
-        top: 0;
+    }
+}
+
+@keyframes redtoblack {
+    100% {
+        background: var(--black);
     }
 }
 
 #p19 {
-    background: url(./pages/p_23.png);
-    background-size: contain;
-    background-repeat: no-repeat;
+    background: var(--red);
+
+    animation: redtoblack 3s ease;
+    animation-fill-mode: forwards;
+    animation-delay: 4s;
 
     &::after {
         content: "";
         width: 100%;
         height: 100%;
         position: absolute;
-        background: var(--black);
+        background: url(./pages/p_23.png);
+        background-size: contain;
+        background-repeat: no-repeat;
         opacity: 0;
-        
-        top: -100%;
 
-        animation: fadetoblack 3s ease ;
+        z-index: 1;
+
+        animation: fadetoblack 3s ease;
         animation-fill-mode: forwards;
         animation-delay: 4s;
-    
+
         transition: all .3s ease;
     }
 }
@@ -564,6 +572,12 @@ p {
     animation: pickup 0.2s ease forwards;
 }
 
+.draggable.drag-over {
+    outline: 3px dashed white;
+    outline-offset: 5px;
+    filter: brightness(0.8);
+}
+
 /* Pickup animation */
 
 @keyframes pickup {
@@ -581,6 +595,10 @@ p {
 /* Initial image positions */
 
 /* Page 24 */
+
+#img1, #img2, #img3, #img4, #img5 {
+    width: 10rem;
+}
 
 #img1 {
     top: 15%;

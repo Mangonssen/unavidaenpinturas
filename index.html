@@ -39,23 +39,20 @@
             <section class="page right" id="p17"></section>
             <section class="page left" id="p18"></section>
             <section class="page right" id="p19"></section>
-            <section class="page left" id="p20"></section>
-            <section class="page right" id="p21"></section>
+            <section class="page left" id="p20">
+                <img src="./assets/posters/painting.png" class="draggable" id="img1">
+                <img src="./assets/posters/rock.jpg" class="draggable" id="img2">
+                <img src="./assets/posters/woman.jpg" class="draggable" id="img3">
+            </section>
+            <section class="page right" id="p21">
+                <img src="./assets/posters/napkin.png" class="draggable" id="img4">
+                <img src="./assets/posters/tutorial.png" class="draggable" id="img5">
+            </section>
             <section class="page left" id="p22"></section>
             <section class="page right" id="p23"></section>
             <section class="page left" id="p24">
-
-                <img src="https://placehold.co/250x250" class="draggable" id="img1">
-                <img src="./assets/images/image2.png" class="draggable" id="img2">
-                <img src="./assets/images/image3.png" class="draggable" id="img3">
-
             </section>
-
             <section class="page right" id="p25">
-
-                <img src="./assets/images/image4.png" class="draggable" id="img4">
-                <img src="./assets/images/image5.png" class="draggable" id="img5">
-
             </section>
             <section class="page single" id="back"></section>
 
@@ -70,479 +67,761 @@
                 <button id="next">Next ></button>
     </div>
 
+
     <script>
-    const book = document.getElementById("book");
-    const pages = Array.from(book.children);
+        const book = document.getElementById("book");
+        const pages = Array.from(book.children);
 
-    const prev = document.getElementById("prev");
-    const next = document.getElementById("next");
+        const prev = document.getElementById("prev");
+        const next = document.getElementById("next");
 
-    let current = 0;
+        let current = 0;
 
-    // AUDIO CLIPS
+        // ======================================
+        // AUDIO CLIPS
+        // ======================================
 
-    const pulseAudio = new Audio("./assets/sound/pulse.mp3");
-    pulseAudio.volume = 0.5;
+        const pulseAudio = new Audio("./assets/sound/pulse.mp3");
+        pulseAudio.volume = 0.75;
 
-    const staticAudio = new Audio("./assets/sound/static.mp3");
-    staticAudio.volume = 0.05;
-    staticAudio.loop = true;
-    staticAudio.play().catch(() => {});
+        const staticAudio = new Audio("./assets/sound/static.mp3");
+        staticAudio.volume = 0.05;
+        staticAudio.loop = true;
+        staticAudio.play().catch(() => { });
 
-    const clockAudio = new Audio("./assets/sound/clock.mp3");
+        const clockAudio = new Audio("./assets/sound/clock.mp3");
 
-    const fireAudio = new Audio("./assets/sound/fire.mp3");
-    fireAudio.volume = 0.25;
+        const fireAudio = new Audio("./assets/sound/fire.mp3");
+        fireAudio.volume = 0.25;
 
-    const nyAudio = new Audio("./assets/sound/ny.mp3");
-    nyAudio.volume = 0.15;
+        const nyAudio = new Audio("./assets/sound/ny.mp3");
+        nyAudio.volume = 0.15;
 
-    const waterAudio = new Audio("./assets/sound/water.mp3");
-    waterAudio.volume = 0.25;
+        const waterAudio = new Audio("./assets/sound/water.mp3");
+        waterAudio.volume = 0.25;
 
-    const restaurantAudio = new Audio("./assets/sound/restaurant.mp3");
-    restaurantAudio.volume = 0.15;
+        const restaurantAudio = new Audio("./assets/sound/restaurant.mp3");
+        restaurantAudio.volume = 0.15;
 
-    const heartAudio = new Audio("./assets/sound/heart.mp3");
-    heartAudio.volume = 0.25;
+        const heartAudio = new Audio("./assets/sound/heart.mp3");
+        heartAudio.volume = 0.25;
 
-    const stepsAudio = new Audio("./assets/sound/steps.mp3");
-    stepsAudio.volume = 0.5;
-
-
-    // DRAGGABLE IMAGES
-
-    const draggableImages = [
-        "img1",
-        "img2",
-        "img3",
-        "img4",
-        "img5"
-    ];
-
-    let draggedImage = null;
-
-    let offsetX = 0;
-    let offsetY = 0;
-
-    let currentRotation = 0;
-    let startX = 0;
+        const stepsAudio = new Audio("./assets/sound/steps.mp3");
+        stepsAudio.volume = 0.5;
 
 
-    // INITIALIZE DRAGGABLE IMAGES
+        // ======================================
+        // DRAGGABLE IMAGES
+        // ======================================
 
-    function initializeDraggableImages() {
+        const draggableImages = [
+            "img1",
+            "img2",
+            "img3",
+            "img4",
+            "img5"
+        ];
 
-        draggableImages.forEach(id => {
+        let draggedImage = null;
 
-            const img = document.getElementById(id);
+        let offsetX = 0;
+        let offsetY = 0;
 
-            if (!img) return;
+        let currentRotation = 0;
+        let startX = 0;
 
-            img.addEventListener("pointerdown", startDrag);
+
+        // ======================================
+        // INDEXEDDB STORAGE
+        // ======================================
+
+        let imageDB;
+
+        // Keep uploaded images available when pages are cloned
+
+        const savedImages = {};
+        const imageURLs = {};
+
+        const dbRequest = indexedDB.open("MyBookImages", 1);
+
+        dbRequest.onupgradeneeded = (e) => {
+
+            imageDB = e.target.result;
+
+            if (!imageDB.objectStoreNames.contains("images")) {
+                imageDB.createObjectStore("images");
+            }
+
+        };
+
+        dbRequest.onsuccess = (e) => {
+
+            imageDB = e.target.result;
+
+            restoreImages();
+
+        };
+
+        dbRequest.onerror = () => {
+
+            console.error("Could not open image database.");
+
+        };
+
+
+        // ======================================
+        // PREVENT BROWSER DEFAULT FILE DROP
+        // ======================================
+
+        window.addEventListener("dragover", (e) => {
+
+            if (e.dataTransfer.types.includes("Files")) {
+                e.preventDefault();
+            }
 
         });
 
-    }
+        window.addEventListener("drop", (e) => {
+
+            if (e.dataTransfer.types.includes("Files")) {
+                e.preventDefault();
+            }
+
+        });
 
 
-    // START DRAGGING
+        // ======================================
+        // INITIALIZE DRAGGABLE IMAGES
+        // ======================================
 
-    function startDrag(e) {
+        function initializeDraggableImages() {
 
-        draggedImage = e.currentTarget;
+            draggableImages.forEach(id => {
 
-        e.preventDefault();
+                const img = document.getElementById(id);
 
-        draggedImage.setPointerCapture(e.pointerId);
+                if (!img || img.dataset.dragInitialized) return;
 
-        const rect = draggedImage.getBoundingClientRect();
+                img.dataset.dragInitialized = "true";
 
-        const parentRect =
-            draggedImage.parentElement.getBoundingClientRect();
+                // Prevent native image dragging
 
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
+                img.draggable = false;
 
-        startX = e.clientX;
+                img.addEventListener("pointerdown", startDrag);
 
-        // Get current rotation
-
-        const transform =
-            window.getComputedStyle(draggedImage).transform;
-
-        if (transform !== "none") {
-
-            const matrix = new DOMMatrix(transform);
-
-            currentRotation =
-                Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
-
-        } else {
-
-            currentRotation = 0;
+            });
 
         }
 
-        // Convert position to page-relative coordinates
 
-        draggedImage.style.left =
-            (rect.left - parentRect.left) + "px";
+        // ======================================
+        // START DRAGGING
+        // ======================================
 
-        draggedImage.style.top =
-            (rect.top - parentRect.top) + "px";
+        function startDrag(e) {
 
-        draggedImage.classList.add("dragging");
+            draggedImage = e.currentTarget;
 
-        draggedImage.style.transform =
-            `rotate(${currentRotation}deg) scale(1.08)`;
+            e.preventDefault();
 
-        draggedImage.addEventListener("pointermove", dragImage);
-        draggedImage.addEventListener("pointerup", stopDrag);
-        draggedImage.addEventListener("pointercancel", stopDrag);
+            draggedImage.setPointerCapture(e.pointerId);
 
-    }
+            const rect = draggedImage.getBoundingClientRect();
 
+            const parentRect =
+                draggedImage.parentElement.getBoundingClientRect();
 
-    // DRAG IMAGE
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
 
-    function dragImage(e) {
+            startX = e.clientX;
 
-        if (!draggedImage) return;
+            // Get current rotation
 
-        const parentRect =
-            draggedImage.parentElement.getBoundingClientRect();
+            const transform =
+                window.getComputedStyle(draggedImage).transform;
 
-        const imageWidth = draggedImage.offsetWidth;
-        const imageHeight = draggedImage.offsetHeight;
+            if (transform !== "none") {
 
-        let x = e.clientX - parentRect.left - offsetX;
-        let y = e.clientY - parentRect.top - offsetY;
+                const matrix = new DOMMatrix(transform);
 
-        // Keep image inside its page
+                currentRotation =
+                    Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
 
-        x = Math.max(
-            0,
-            Math.min(x, parentRect.width - imageWidth)
-        );
+            } else {
 
-        y = Math.max(
-            0,
-            Math.min(y, parentRect.height - imageHeight)
-        );
-
-        draggedImage.style.left = x + "px";
-        draggedImage.style.top = y + "px";
-
-        // Tilting animation based on movement
-
-        const movement = e.clientX - startX;
-
-        const tilt = Math.max(
-            -15,
-            Math.min(15, movement * 0.3)
-        );
-
-        draggedImage.style.transform =
-            `rotate(${currentRotation + tilt}deg) scale(1.08)`;
-
-    }
-
-
-    // STOP DRAGGING
-
-    function stopDrag(e) {
-
-        if (!draggedImage) return;
-
-        const img = draggedImage;
-
-        img.classList.remove("dragging");
-
-        // Return to original rotation
-
-        img.style.transform =
-            `rotate(${currentRotation}deg) scale(1)`;
-
-        img.removeEventListener("pointermove", dragImage);
-        img.removeEventListener("pointerup", stopDrag);
-        img.removeEventListener("pointercancel", stopDrag);
-
-        draggedImage = null;
-
-    }
-
-
-    // RENDER BOOK
-
-    function renderBook() {
-
-        book.classList.add("turning");
-
-        setTimeout(() => {
-
-            book.innerHTML = "";
-
-            // COVER
-
-            if (current === 0) {
-
-                book.appendChild(pages[0].cloneNode(true));
+                currentRotation = 0;
 
             }
 
-            // BACK COVER
+            // Convert position to page-relative coordinates
 
-            else if (current === pages.length - 1) {
+            draggedImage.style.left =
+                (rect.left - parentRect.left) + "px";
 
-                book.appendChild(
-                    pages[pages.length - 1].cloneNode(true)
+            draggedImage.style.top =
+                (rect.top - parentRect.top) + "px";
+
+            draggedImage.classList.add("dragging");
+
+            draggedImage.style.transform =
+                `rotate(${currentRotation}deg) scale(1.08)`;
+
+            draggedImage.addEventListener("pointermove", dragImage);
+            draggedImage.addEventListener("pointerup", stopDrag);
+            draggedImage.addEventListener("pointercancel", stopDrag);
+
+        }
+
+
+        // ======================================
+        // DRAG IMAGE
+        // ======================================
+
+        function dragImage(e) {
+
+            if (!draggedImage) return;
+
+            const parentRect =
+                draggedImage.parentElement.getBoundingClientRect();
+
+            const imageWidth = draggedImage.offsetWidth;
+            const imageHeight = draggedImage.offsetHeight;
+
+            let x = e.clientX - parentRect.left - offsetX;
+            let y = e.clientY - parentRect.top - offsetY;
+
+            // Keep image inside its page
+
+            x = Math.max(
+                0,
+                Math.min(x, parentRect.width - imageWidth)
+            );
+
+            y = Math.max(
+                0,
+                Math.min(y, parentRect.height - imageHeight)
+            );
+
+            draggedImage.style.left = x + "px";
+            draggedImage.style.top = y + "px";
+
+            // Tilting animation
+
+            const movement = e.clientX - startX;
+
+            const tilt = Math.max(
+                -15,
+                Math.min(15, movement * 0.3)
+            );
+
+            draggedImage.style.transform =
+                `rotate(${currentRotation + tilt}deg) scale(1.08)`;
+
+        }
+
+
+        // ======================================
+        // STOP DRAGGING
+        // ======================================
+
+        function stopDrag(e) {
+
+            if (!draggedImage) return;
+
+            const img = draggedImage;
+
+            img.classList.remove("dragging");
+
+            img.style.transform =
+                `rotate(${currentRotation}deg) scale(1)`;
+
+            img.removeEventListener("pointermove", dragImage);
+            img.removeEventListener("pointerup", stopDrag);
+            img.removeEventListener("pointercancel", stopDrag);
+
+            draggedImage = null;
+
+        }
+
+
+        // ======================================
+        // DIRECT IMAGE DROP
+        // ======================================
+
+        function enableFileDrop() {
+
+            document.querySelectorAll(".draggable").forEach(img => {
+
+                if (img.dataset.dropInitialized) return;
+
+                img.dataset.dropInitialized = "true";
+
+                img.addEventListener("dragenter", (e) => {
+
+                    if (!e.dataTransfer.types.includes("Files")) return;
+
+                    e.preventDefault();
+
+                    img.classList.add("drag-over");
+
+                });
+
+                img.addEventListener("dragover", (e) => {
+
+                    if (!e.dataTransfer.types.includes("Files")) return;
+
+                    e.preventDefault();
+
+                    e.stopPropagation();
+
+                    e.dataTransfer.dropEffect = "copy";
+
+                    img.classList.add("drag-over");
+
+                });
+
+                img.addEventListener("dragleave", (e) => {
+
+                    img.classList.remove("drag-over");
+
+                });
+
+                img.addEventListener("drop", (e) => {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    img.classList.remove("drag-over");
+
+                    const file = e.dataTransfer.files[0];
+
+                    if (!file || !file.type.startsWith("image/")) return;
+
+                    if (file.size > 10 * 1024 * 1024) {
+
+                        alert("Image must be smaller than 10 MB.");
+
+                        return;
+
+                    }
+
+                    if (!imageDB) {
+
+                        console.error("Image database is not ready.");
+
+                        return;
+
+                    }
+
+                    // Save image in IndexedDB
+
+                    const transaction = imageDB.transaction(
+                        "images",
+                        "readwrite"
+                    );
+
+                    transaction.objectStore("images").put(file, img.id);
+
+                    transaction.oncomplete = () => {
+
+                        // Keep image available for future page renders
+
+                        savedImages[img.id] = file;
+
+                        // Replace previous object URL
+
+                        if (imageURLs[img.id]) {
+
+                            URL.revokeObjectURL(imageURLs[img.id]);
+
+                        }
+
+                        // Create new image URL
+
+                        const imageURL = URL.createObjectURL(file);
+
+                        imageURLs[img.id] = imageURL;
+
+                        // Replace existing image immediately
+
+                        img.src = imageURL;
+
+                    };
+
+                    transaction.onerror = () => {
+
+                        console.error("Could not save uploaded image.");
+
+                    };
+
+                });
+
+            });
+
+        }
+
+
+        // ======================================
+        // RESTORE SAVED IMAGES
+        // ======================================
+
+        function restoreImages() {
+
+            draggableImages.forEach(id => {
+
+                const transaction = imageDB.transaction(
+                    "images",
+                    "readonly"
                 );
 
-            }
+                const request =
+                    transaction.objectStore("images").get(id);
 
-            // DOUBLE PAGE SPREADS
+                request.onsuccess = () => {
 
-            else {
+                    if (!request.result) return;
 
-                book.appendChild(
-                    pages[current].cloneNode(true)
-                );
+                    savedImages[id] = request.result;
 
-                book.appendChild(
-                    pages[current + 1].cloneNode(true)
-                );
+                    const img = document.getElementById(id);
 
-            }
+                    if (img) {
 
-            // Reinitialize draggable images on cloned pages
+                        if (imageURLs[id]) {
 
-            initializeDraggableImages();
+                            URL.revokeObjectURL(imageURLs[id]);
 
-            prev.disabled = current === 0;
-            next.disabled = current === pages.length - 1;
+                        }
 
-            book.classList.remove("turning");
+                        imageURLs[id] =
+                            URL.createObjectURL(request.result);
 
-        }, 150);
+                        img.src = imageURLs[id];
 
+                    }
 
-        // PULSE AUDIO
+                };
 
-        if (current === 7) {
-
-            pulseAudio.play();
-            pulseAudio.loop = true;
-
-        } else {
-
-            pulseAudio.loop = false;
-            pulseAudio.pause();
-            pulseAudio.currentTime = 0;
+            });
 
         }
 
 
-        // CLOCK AUDIO
+        // ======================================
+        // APPLY SAVED IMAGES TO CLONED PAGES
+        // ======================================
 
-        if (current === 9) {
+        function applySavedImages() {
 
-            clockAudio.play();
+            draggableImages.forEach(id => {
 
-        } else {
+                const img = document.getElementById(id);
 
-            clockAudio.pause();
-            clockAudio.currentTime = 0;
+                if (!img || !savedImages[id]) return;
 
-        }
+                if (!imageURLs[id]) {
 
+                    imageURLs[id] =
+                        URL.createObjectURL(savedImages[id]);
 
-        // FIRE AUDIO
+                }
 
-        if (current === 11) {
+                img.src = imageURLs[id];
 
-            fireAudio.play();
-
-        } else {
-
-            fireAudio.pause();
-            fireAudio.currentTime = 0;
+            });
 
         }
 
 
-        // NEW YORK AUDIO
+        // ======================================
+        // RENDER BOOK
+        // ======================================
 
-        if (current === 13) {
+        function renderBook() {
 
-            nyAudio.play();
+            book.classList.add("turning");
 
-        } else {
+            setTimeout(() => {
 
-            nyAudio.pause();
-            nyAudio.currentTime = 0;
+                book.innerHTML = "";
 
-        }
+                // COVER
 
+                if (current === 0) {
 
-        // WATER AUDIO
+                    book.appendChild(pages[0].cloneNode(true));
 
-        if (current === 15) {
+                }
 
-            waterAudio.play();
-            waterAudio.loop = true;
+                // BACK COVER
 
-        } else {
+                else if (current === pages.length - 1) {
 
-            waterAudio.loop = false;
-            waterAudio.pause();
-            waterAudio.currentTime = 0;
+                    book.appendChild(
+                        pages[pages.length - 1].cloneNode(true)
+                    );
 
-        }
+                }
 
+                // DOUBLE PAGE SPREADS
 
-        // RESTAURANT AUDIO
+                else {
 
-        if (current === 17) {
+                    book.appendChild(
+                        pages[current].cloneNode(true)
+                    );
 
-            restaurantAudio.play();
+                    book.appendChild(
+                        pages[current + 1].cloneNode(true)
+                    );
 
-        } else {
+                }
 
-            restaurantAudio.pause();
-            restaurantAudio.currentTime = 0;
+                // Apply uploaded images to cloned pages
 
-        }
+                applySavedImages();
 
+                // Initialize interactions on cloned pages
 
-        // HEART AUDIO
+                initializeDraggableImages();
 
-        if (current === 19) {
+                enableFileDrop();
 
-            heartAudio.play();
-            heartAudio.loop = true;
+                prev.disabled = current === 0;
+                next.disabled = current === pages.length - 1;
 
-        } else {
+                book.classList.remove("turning");
 
-            heartAudio.pause();
-            heartAudio.loop = false;
-            heartAudio.currentTime = 0;
-
-        }
-
-
-        // FOOTSTEPS AUDIO
-
-        if (current === 21) {
-
-            stepsAudio.play();
-
-        } else {
-
-            stepsAudio.pause();
-            stepsAudio.currentTime = 0;
-
-        }
-
-    }
+            }, 150);
 
 
-    // NEXT BUTTON
+            // PULSE AUDIO
 
-    next.addEventListener("click", () => {
+            if (current === 7) {
 
-        if (current < pages.length - 1) {
+                pulseAudio.play();
+                pulseAudio.loop = true;
 
-            if (current === 0) {
+            } else {
 
-                current = 1;
+                pulseAudio.loop = false;
+                pulseAudio.pause();
+                pulseAudio.currentTime = 0;
 
             }
 
-            else if (current === pages.length - 3) {
 
-                current = pages.length - 1;
+            // CLOCK AUDIO
+
+            if (current === 9) {
+
+                clockAudio.play();
+
+            } else {
+
+                clockAudio.pause();
+                clockAudio.currentTime = 0;
 
             }
 
-            else {
 
-                current += 2;
+            // FIRE AUDIO
+
+            if (current === 11) {
+
+                fireAudio.play();
+
+            } else {
+
+                fireAudio.pause();
+                fireAudio.currentTime = 0;
 
             }
 
-            renderBook();
 
-            const audio = new Audio("./assets/sound/turnpage.mp3");
-            audio.play();
+            // NEW YORK AUDIO
 
-            console.log(current);
+            if (current === 13) {
+
+                nyAudio.play();
+
+            } else {
+
+                nyAudio.pause();
+                nyAudio.currentTime = 0;
+
+            }
+
+
+            // WATER AUDIO
+
+            if (current === 15) {
+
+                waterAudio.play();
+                waterAudio.loop = true;
+
+            } else {
+
+                waterAudio.loop = false;
+                waterAudio.pause();
+                waterAudio.currentTime = 0;
+
+            }
+
+
+            // RESTAURANT AUDIO
+
+            if (current === 17) {
+
+                restaurantAudio.play();
+
+            } else {
+
+                restaurantAudio.pause();
+                restaurantAudio.currentTime = 0;
+
+            }
+
+
+            // HEART AUDIO
+
+            if (current === 19) {
+
+                heartAudio.play();
+                heartAudio.loop = true;
+
+            } else {
+
+                heartAudio.pause();
+                heartAudio.loop = false;
+                heartAudio.currentTime = 0;
+
+            }
+
+
+            // FOOTSTEPS AUDIO
+
+            if (current === 21) {
+
+                stepsAudio.play();
+
+            } else {
+
+                stepsAudio.pause();
+                stepsAudio.currentTime = 0;
+
+            }
 
         }
 
-    });
 
+        // ======================================
+        // NEXT BUTTON
+        // ======================================
 
-    // PREVIOUS BUTTON
+        next.addEventListener("click", () => {
 
-    prev.addEventListener("click", () => {
+            if (current < pages.length - 1) {
 
-        if (current > 0) {
+                if (current === 0) {
 
-            if (current === pages.length - 1) {
+                    current = 1;
 
-                current = pages.length - 3;
+                }
+
+                else if (current === pages.length - 3) {
+
+                    current = pages.length - 1;
+
+                }
+
+                else {
+
+                    current += 2;
+
+                }
+
+                renderBook();
+
+                const audio = new Audio("./assets/sound/turnpage.mp3");
+                audio.play();
+
+                console.log(current);
 
             }
 
-            else if (current === 1) {
+        });
 
-                current = 0;
+
+        // ======================================
+        // PREVIOUS BUTTON
+        // ======================================
+
+        prev.addEventListener("click", () => {
+
+            if (current > 0) {
+
+                if (current === pages.length - 1) {
+
+                    current = pages.length - 3;
+
+                }
+
+                else if (current === 1) {
+
+                    current = 0;
+
+                }
+
+                else {
+
+                    current -= 2;
+
+                }
+
+                renderBook();
+
+                const audio = new Audio("./assets/sound/turnpage.mp3");
+                audio.play();
+
+                console.log(current);
 
             }
 
-            else {
+        });
 
-                current -= 2;
+
+        // ======================================
+        // KEYBOARD NAVIGATION
+        // ======================================
+
+        document.addEventListener("keydown", (e) => {
+
+            if (e.key === "ArrowRight") {
+
+                next.click();
 
             }
 
-            renderBook();
+            if (e.key === "ArrowLeft") {
 
-            const audio = new Audio("./assets/sound/turnpage.mp3");
-            audio.play();
+                prev.click();
 
-            console.log(current);
+            }
 
-        }
-
-    });
+        });
 
 
-    // KEYBOARD NAVIGATION
+        // ======================================
+        // INITIALIZE
+        // ======================================
 
-    document.addEventListener("keydown", (e) => {
+        renderBook();
 
-        if (e.key === "ArrowRight") {
+    </script>
 
-            next.click();
-
-        }
-
-        if (e.key === "ArrowLeft") {
-
-            prev.click();
-
-        }
-
-    });
-
-
-    // INITIALIZE
-
-    renderBook();
-
-</script>
 
 </body>
 
