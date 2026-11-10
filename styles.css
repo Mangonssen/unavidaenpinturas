@@ -368,6 +368,13 @@ p {
 #innertitle-2 {
     background: url(./pages/p_7.png);
     background-size: contain;
+
+    justify-content: end;
+    align-items: end;
+
+    img {
+        width: 3rem;
+    }
 }
 
 #p4 {
